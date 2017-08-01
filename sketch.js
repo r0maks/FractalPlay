@@ -11,14 +11,17 @@ function draw() {
     background(41);
     angle = slider.value();
 
-
     var seedLength = 150;
-
 
     stroke(240);
     translate(200, height);
     branch(seedLength * angle);
+    branch(seedLength * angle);
+    branch(seedLength * angle);
 }
+
+
+// TODO add a control to add number of branchest to the process
 
 
 function getRandomMultiplier(){
@@ -30,6 +33,8 @@ function branch(len) {
   stroke(random(230), random(230), random(230));
   line(0, 0, 0, -len);
   translate(0, -len);
+
+  setTimeout(function(){}, 3000000);
   if (len > 20) {
     push();
     rotate(angle);
