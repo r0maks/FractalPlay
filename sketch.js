@@ -21,8 +21,9 @@ function draw() {
 }
 
 
-// TODO add a control to add number of branchest to the process
-
+// TODO add a control to add number of branches to the process
+// Color bar
+// Integrate with angular controller?
 
 function getRandomMultiplier(){
     return random(0.8);
