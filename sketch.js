@@ -14,9 +14,7 @@ function draw() {
     var seedLength = 150;
 
     stroke(240);
-    translate(200, height);
-    branch(seedLength * angle);
-    branch(seedLength * angle);
+    translate(500, height);
     branch(seedLength * angle);
 }
 
@@ -24,26 +22,29 @@ function draw() {
 // TODO add a control to add number of branches to the process
 // Color bar
 // Integrate with angular controller?
+// TODO add a color picker
 
-function getRandomMultiplier(){
-    return random(0.8);
+function getRandomMultiplier() {
+    return random(0, .75);
 }
 
 function branch(len) {
-  strokeWeight(random(5))
-  stroke(random(230), random(230), random(230));
-  line(0, 0, 0, -len);
-  translate(0, -len);
+    strokeWeight(random(5))
 
-  setTimeout(function(){}, 3000000);
-  if (len > 20) {
-    push();
-    rotate(angle);
-    branch(len * getRandomMultiplier());
-    pop();
-    push();
-    rotate(-angle);
-    branch(len * getRandomMultiplier());
-    pop();
-  }
+    stroke(random(100, 255), random(0, 80), random(0, 80));
+
+    line(0, 0, 0, -len);
+    translate(0, -len);
+
+    var inc = 1;
+    for (var i = 0; i < 2; i++) {
+        if (len > 4) {
+            push();
+            rotate((angle ) * inc);
+            branch(len * .7);
+            pop();
+            inc = inc * -1;
+        }
+    }
+
 }
