@@ -1,50 +1,81 @@
 
 var angle = 0;
 var slider;
+var value = 0;
+
+var xPos= 0;
+var yPos = 0;
+var circles = [];
+var mousePositions = [];
+var go = false;
 
 function setup() {
     createCanvas(1000, 750);
-    slider = createSlider(0, TWO_PI, PI / 4, 0.01);
+    background(41);
 }
 
 function draw() {
     background(41);
-    angle = slider.value();
-
-    var seedLength = 150;
-
-    stroke(240);
-    translate(500, height);
-    branch(seedLength * angle);
-}
-
-
-// TODO add a control to add number of branches to the process
-// Color bar
-// Integrate with angular controller?
-// TODO add a color picker
-
-function getRandomMultiplier() {
-    return random(0, .75);
-}
-
-function branch(len) {
-    strokeWeight(random(5))
-
-    stroke(random(100, 255), random(0, 80), random(0, 80));
-
-    line(0, 0, 0, -len);
-    translate(0, -len);
-
-    var inc = 1;
-    for (var i = 0; i < 2; i++) {
-        if (len > 4) {
-            push();
-            rotate((angle ) * inc);
-            branch(len * .7);
-            pop();
-            inc = inc * -1;
-        }
+    for (var index = 0; index < circles.length; index++) {
+        var e = circles[index];
+        fill(e.color);
+        stroke(e.color);
+        ellipse(e.x, e.y, e.w, e.h); 
     }
 
+    for (var index = 0; index < mousePositions.length; index++) {
+        var pos = mousePositions[index];
+        ellipse(pos.x, pos.y, 10, 10); 
+    }
 }
+
+function mouseClicked() {
+    // always set the current mouse position
+    xPos = mouseX;
+    yPos = mouseY;
+
+    addCircleToStack(xPos, yPos);
+
+  }
+
+  function mouseMoved() {
+    go=true;
+    mousePositions.push({x: mouseX, y: mouseY});
+
+    if (mousePositions.length > 100) {
+        mousePositions.splice(0, 1);
+    }
+  }
+
+
+  function addCircleToStack(x, y) {
+
+    var w = random(80, 80);
+    var h = random(80, 80);
+
+    if(!hasCollision(x, y, w, h)) {
+        circles.push({x: x, y:y, w: w, h: h, color: color(random(100, 255), random(0, 80), random(0, 80))});
+    }
+  }
+
+
+  function hasCollision(x, y, w, h) {
+
+    for (var colIndex = 0; colIndex < circles.length; colIndex++) {
+        var thisCircle = circles[colIndex];
+
+        if (thisCircle.x < x + w &&
+            thisCircle.x + thisCircle.w > x &&
+            thisCircle.y < y + h &&
+            thisCircle.h + thisCircle.y > y) {
+
+                console.log('Collision detected');
+
+
+            return true;
+         }
+    }
+
+    return false;
+  }
+
