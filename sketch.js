@@ -7,22 +7,106 @@ var xPos= 0;
 var yPos = 0;
 var circles = [];
 var mousePositions = [];
-var go = false;
+var WINDOW_WIDTH = 1024;
+var WINDOW_HEIGHT = 768;
 
+var starLimit = 2000;
+var GLIMMER_INTERVAL = 10;
+var stars = [];
+
+
+// base setUp
 function setup() {
-    createCanvas(1000, 750);
-    background(41);
+    createCanvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+    frameRate(10);
 }
 
 function draw() {
-    background(41);
-    for (var index = 0; index < circles.length; index++) {
-        var e = circles[index];
-        fill(e.color);
-        stroke(e.color);
-        ellipse(e.x, e.y, e.w, e.h); 
-    }
+    // Step 1: Clear frame
+    clearFrame();
 
+    // Step 2: Handle asset persistance
+    // drawCircles();
+    drawNightSky();
+
+    // Step 3: Handle mouse movements
+    // drawMouseTrail();
+}
+
+function clearFrame() {
+    background(25);
+}
+
+function buildNightSky(densityFactor) {
+    for (var starIndex = 0; starIndex < starLimit; starIndex++) {
+
+        var range = random(0, 5);
+
+        var w = random(2, range);
+        var h = random(2, range);
+        var x = random(0, WINDOW_WIDTH);
+        var y = random(0, WINDOW_HEIGHT);
+
+        stars.push({
+            x: x, y:y, 
+            w: w, h: h,
+        });
+    }
+}
+
+function getStarColor() {
+    return color(random(240, 255), random(240, 255), random(230, 255));
+}
+
+function getGlimmerColor() {
+    return color(random(150, 255), random(0, 75), random(0, 75));
+}
+
+function drawNightSky() {
+
+    for (var index = 0; index < stars.length; index++) {
+        var s = stars[index];
+
+        var starColor = getStarColor();;
+
+        if (s.canGlimmer && index > 1990) {
+            drawArcAroundStar(s);
+        }
+
+        if (s.canGlimmer) {
+            starColor = getGlimmerColor();
+        } else {
+            s.canGlimmer = canGlimmer();
+        }
+
+        setFillAndStroke(starColor);
+        drawStar(s);
+    }
+}
+
+function drawStar(star) {
+    star.lastFrameShown = frameCount;
+    ellipse(star.x, star.y, star.w, star.h); 
+}
+
+function drawArcAroundStar(star) {
+    noFill();
+    stroke(getStarColor());
+    strokeWeight(random(0, 1))
+    ellipse(star.x, star.y, star.w + random(0, 10), star.h + random(0, 10)); 
+    strokeWeight(random)
+}
+
+function setFillAndStroke(color) {
+    fill(color);
+    stroke(color);
+}
+
+function canGlimmer() {
+    return random(0, 1000) > 500;
+}
+
+function drawMouseTrail(){
     for (var index = 0; index < mousePositions.length; index++) {
         var pos = mousePositions[index];
         ellipse(pos.x, pos.y, 10, 10); 
@@ -34,27 +118,16 @@ function mouseClicked() {
     xPos = mouseX;
     yPos = mouseY;
 
-    addCircleToStack(xPos, yPos);
+    buildNightSky();
 
   }
 
   function mouseMoved() {
-    go=true;
+    // console.log("Mouse pos: x: " + mouseX + " y: " + mouseY);
     mousePositions.push({x: mouseX, y: mouseY});
 
     if (mousePositions.length > 100) {
         mousePositions.splice(0, 1);
-    }
-  }
-
-
-  function addCircleToStack(x, y) {
-
-    var w = random(80, 80);
-    var h = random(80, 80);
-
-    if(!hasCollision(x, y, w, h)) {
-        circles.push({x: x, y:y, w: w, h: h, color: color(random(100, 255), random(0, 80), random(0, 80))});
     }
   }
 
