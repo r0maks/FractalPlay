@@ -1,44 +1,72 @@
-
-var angle = 0;
-var slider;
-var value = 0;
-
 var xPos= 0;
 var yPos = 0;
 var circles = [];
 var mousePositions = [];
-var WINDOW_WIDTH = 1024;
-var WINDOW_HEIGHT = 768;
-
-var starLimit = 2000;
-var GLIMMER_INTERVAL = 10;
 var stars = [];
 
+// Constants
+var WINDOW_WIDTH = 1024;
+var WINDOW_HEIGHT = 768;
+var STAR_LIMIT = 4500;
+var GLIMMER_INTERVAL = 10;
 
-// base setUp
+var Y_AXIS = 1;
+var X_AXIS = 2;
+var c1, c2;
+
+// base set up
 function setup() {
+
     createCanvas(WINDOW_WIDTH, WINDOW_HEIGHT);
-    frameRate(10);
+    frameRate(20);
 }
 
 function draw() {
     // Step 1: Clear frame
-    clearFrame();
-
+    // background(21);
+    setGradient(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, c2, c1, X_AXIS);
     // Step 2: Handle asset persistance
     // drawCircles();
     drawNightSky();
 
     // Step 3: Handle mouse movements
-    drawMouseTrail();
+    // drawMouseTrail();
 }
 
-function clearFrame() {
-    background(45, 52, 54)
+function showNewNightSky() {
+    // set bg
+    setRandomizedGradientColors();
+
+    // clear stars
+    stars = [];
+
+    buildNightSky();
 }
 
-function buildNightSky(densityFactor) {
-    for (var starIndex = 0; starIndex < starLimit; starIndex++) {
+function setRandomizedGradientColors(){
+
+    var colorPallete = [
+        color(34,17,34),
+        color(51,34,85),
+        color(85,68,170),
+        color(51,51,119),
+    ];
+
+    if (colorPallete) {
+
+        c1 = colorPallete[int(random(colorPallete.length))];
+        c2 = colorPallete[int(random(colorPallete.length))];
+
+    } else {
+        
+        c1 = color(31);
+        c2 = color(42);
+    }
+}
+
+function buildNightSky() {
+
+    for (var starIndex = 0; starIndex < STAR_LIMIT; starIndex++) {
 
         var range = random(0, 5);
 
@@ -50,8 +78,13 @@ function buildNightSky(densityFactor) {
         stars.push({
             x: x, y:y, 
             w: w, h: h,
+            hasArc: getProbability(995),
         });
     }
+}
+
+function getProbability(range) {
+    return random(0, 1000) > range;
 }
 
 function getStarColor() {
@@ -60,8 +93,6 @@ function getStarColor() {
 
 function getGlimmerColor() {
     return color(random(220, 232), random(60, 70), random(10, 24));
-
-    // rgb(232, 65, 24)
 }
 
 function drawNightSky() {
@@ -71,12 +102,13 @@ function drawNightSky() {
 
         var starColor = getStarColor();;
 
-        if (s.canGlimmer && index > 1990) {
+        if (s.canGlimmer && s.hasArc) {
             drawArcAroundStar(s);
         }
 
-        if (s.canGlimmer) {
+        if (s.canGlimmer && frameCount > s.lastFrameGlimmered + 50) {
             starColor = getGlimmerColor();
+            s.lastFrameGlimmered = frameCount
         } else {
             s.canGlimmer = canGlimmer();
         }
@@ -95,7 +127,7 @@ function drawArcAroundStar(star) {
     noFill();
     stroke(getStarColor());
     strokeWeight(random(0, 1))
-    ellipse(star.x, star.y, star.w + random(0, 10), star.h + random(0, 10)); 
+    ellipse(star.x, star.y, star.w + random(5, 10), star.h + random(5, 10)); 
     strokeWeight(random)
 }
 
@@ -120,7 +152,7 @@ function mouseClicked() {
     xPos = mouseX;
     yPos = mouseY;
 
-    buildNightSky();
+    showNewNightSky();
 
   }
 
@@ -130,6 +162,34 @@ function mouseClicked() {
 
     if (mousePositions.length > 100) {
         mousePositions.splice(0, 1);
+    }
+  }
+
+
+  function setGradient(x, y, w, h, c1, c2, axis) {
+
+    if (!c1 || !c2) {
+        c1 = color(41);
+        c2 = color(47);
+    }
+
+    noFill();
+  
+    if (axis == Y_AXIS) {  // Top to bottom gradient
+      for (var i = y; i <= y+h; i++) {
+        var inter = map(i, y, y+h, 0, 1);
+        var c = lerpColor(c1, c2, inter);
+        stroke(c);
+        line(x, i, x+w, i);
+      }
+    }  
+    else if (axis == X_AXIS) {  // Left to right gradient
+      for (var i = x; i <= x+w; i++) {
+        var inter = map(i, x, x+w, 0, 1);
+        var c = lerpColor(c1, c2, inter);
+        stroke(c);
+        line(i, y, i, y+h);
+      }
     }
   }
 
