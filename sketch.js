@@ -30,11 +30,11 @@ function draw() {
     drawNightSky();
 
     // Step 3: Handle mouse movements
-    // drawMouseTrail();
+    drawMouseTrail();
 }
 
 function clearFrame() {
-    background(25);
+    background(45, 52, 54)
 }
 
 function buildNightSky(densityFactor) {
@@ -59,7 +59,9 @@ function getStarColor() {
 }
 
 function getGlimmerColor() {
-    return color(random(150, 255), random(0, 75), random(0, 75));
+    return color(random(220, 232), random(60, 70), random(10, 24));
+
+    // rgb(232, 65, 24)
 }
 
 function drawNightSky() {
@@ -109,7 +111,7 @@ function canGlimmer() {
 function drawMouseTrail(){
     for (var index = 0; index < mousePositions.length; index++) {
         var pos = mousePositions[index];
-        ellipse(pos.x, pos.y, 10, 10); 
+        ellipse(pos.x, pos.y, random(0, 10), random(0, 10)); 
     }
 }
 
